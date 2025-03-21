@@ -8,7 +8,7 @@ mcp = FastMCP("WeatherServer")
 
 # OpenWeather API 配置
 OPENWEATHER_API_BASE = "https://api.openweathermap.org/data/2.5/weather"
-OPEN_WEATHER_API_KEY = "9e14e02f316c831ed171fc091d2fbf64"  # 请替换为你自己的 OpenWeather API Key
+OPEN_WEATHER_API_KEY = "<OpenWeather API Key>"  # 请替换为你自己的 OpenWeather API Key
 USER_AGENT = "weather-app/1.0"
 
 
