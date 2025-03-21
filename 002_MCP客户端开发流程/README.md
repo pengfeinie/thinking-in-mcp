@@ -224,3 +224,51 @@ if __name__ == "__main__":
 ```
 
 ![](images/2025-03-21_145144.png)
+
+### 2.6 MCP客户端接入本地ollama/vLLM模型
+
+接下来，我们继续尝试将ollama、vLLM等模型调度框架接入MCP的client。由于ollama和vLLM均支持OpenAI API风格调用方法，因此上述client.py并不需要进行任何修改，我们只需要启动响应的调度框架服务，然后修改.env文件即可。
+
+#### 2.6.1 MCP客户端接入本地ollama
+
+这里以QwQ-32B为例，尝试借助ollama接入MCP客户端。
+
+- 启动ollama 首先需要启动ollama
+
+  ```bash
+  ollama start
+  ```
+
+- 测试模型能否调用
+
+  ```bash
+  ollama list
+  ollama run qwq
+  ```
+
+- 修改配置文件
+
+  ```bash
+  BASE_URL=https://localhost:11434/v1/
+  MODEL=qwq
+  OPENAI_API_KEY=ollama
+  ```
+
+#### 2.6.1 MCP客户端接入本地vLLM
+
+- 启动vLLM服务
+
+  ```bash
+  cd /root/autodl-tmp
+  CUDA_VISIBLE_DEVICES=0,1 vllm serve ./QwQ-32B --tensor-parallel-size 2
+  ```
+
+- 修改配置文件
+
+  ```bash
+  BASE_URL=https://localhost:8000/v1/
+  MODEL=./QwQ-32B
+  OPENAI_API_KEY=EMPTY
+  ```
+
+  
