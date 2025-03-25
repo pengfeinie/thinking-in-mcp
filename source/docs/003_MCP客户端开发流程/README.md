@@ -92,11 +92,11 @@ uv run client.py
 
 ![](images/2025-03-21_142509.png)
 
-### 1.5 MCP客户端接入DeepSeek在线模型流程
+## 2. MCP客户端接入DeepSeek在线模型流程
 
 接下来尝试在客户端中接入OpenAI和DeepSeek等在线模型进行对话。需要注意的是，由于OpenAI 和DeepSeek调用方法几乎完全一样，因此这套服务器client代码可以同时适用于GPT模型和DeepSeek。
 
-#### 1.5.1 新增依赖
+### 2.1 新增依赖
 
 为了支持调用DeepSeek模型，以及在环境变量中读取API-KEY等信息，需要先安装如下依赖：
 
@@ -106,7 +106,7 @@ uv add mcp openai python-dotenv
 
 ![](images/2025-03-21_143132.png)
 
-#### 1.5.2 创建.env文件
+### 2.2 创建.env文件
 
 接下来创建.env文件，并写入DeepSeek的API-Key，以及服务地址。
 
@@ -116,7 +116,7 @@ touch .env
 
 ![](images/2025-03-21_143722.png)
 
-#### 1.5.3 修改后的client.py代码
+### 2.3 修改后的client.py代码
 
 ```python
 import asyncio
@@ -193,11 +193,11 @@ if __name__ == "__main__":
 
 ![](images/2025-03-21_145144.png)
 
-### 1.6 MCP客户端接入本地ollama/vLLM模型
+## 3. MCP客户端接入本地ollama/vLLM模型
 
 接下来，我们继续尝试将ollama、vLLM等模型调度框架接入MCP的client。由于ollama和vLLM均支持OpenAI API风格调用方法，因此上述client.py并不需要进行任何修改，我们只需要启动响应的调度框架服务，然后修改.env文件即可。
 
-#### 1.6.1 MCP客户端接入本地ollama
+### 3.1 MCP客户端接入本地ollama
 
 这里以QwQ-32B为例，尝试借助ollama接入MCP客户端。
 
@@ -222,7 +222,7 @@ if __name__ == "__main__":
   OPENAI_API_KEY=ollama
   ```
 
-#### 1.6.1 MCP客户端接入本地vLLM
+### 3.2 MCP客户端接入本地vLLM
 
 - 启动vLLM服务
 
