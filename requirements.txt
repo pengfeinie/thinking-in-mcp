@@ -1,0 +1,6 @@
+recommonmark
+sphinx_markdown_tables
+sphinxcontrib.video
+sphinx_rtd_theme
+sphinx 
+rst2pdf
