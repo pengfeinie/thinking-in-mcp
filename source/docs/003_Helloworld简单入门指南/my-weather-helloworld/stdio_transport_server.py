@@ -1,19 +1,20 @@
 import json
-import asyncio
 import httpx
 from typing import Any
-from fastapi import FastAPI, Request
-from sse_starlette.sse import EventSourceResponse
 from mcp.server.fastmcp import FastMCP
+import os
+from dotenv import load_dotenv
+
+# 加载.env文件，确保API Key受到保护
+load_dotenv()
+
+# OpenWeather API 配置
+OPENWEATHER_API_BASE = os.getenv("OPENWEATHER_API_BASE")  
+OPEN_WEATHER_API_KEY = os.getenv("OPEN_WEATHER_API_KEY")  
+USER_AGENT = os.getenv("OPEN_WEATHER_USER_AGENT")  
 
 # 初始化 MCP 服务器
 mcp = FastMCP("WeatherServer")
-app = FastAPI()
-
-# OpenWeather API 配置
-OPENWEATHER_API_BASE = "https://api.openweathermap.org/data/2.5/weather"
-OPEN_WEATHER_API_KEY = "9e14e02f316c831ed171fc091d2fbf64"  # 请替换为你自己的 OpenWeather API Key
-USER_AGENT = "weather-app/1.0"
 
 
 async def fetch_weather(city: str) -> dict[str, Any] | None:
@@ -41,12 +42,6 @@ async def fetch_weather(city: str) -> dict[str, Any] | None:
 
 
 def format_weather(data: dict[str, Any] | str) -> str:
-    """
-    将天气数据格式化为易读文本。
-    :param data: 天气数据（可以是字典或 JSON 字符串）
-    :return: 格式化后的天气信息字符串
-    """
-    # 如果传入的是字符串，则先转换为字典
     if isinstance(data, str):
         try:
             data = json.loads(data)
@@ -54,7 +49,7 @@ def format_weather(data: dict[str, Any] | str) -> str:
             return f"无法解析天气数据: {e}"
     # 如果数据中包含错误信息，直接返回错误提示
     if "error" in data:
-        return f"⚠ {data['error']}"
+        return f"{data['error']}"
     # 提取数据时做容错处理
     city = data.get("name", "未知")
     country = data.get("sys", {}).get("country", "未知")
@@ -84,27 +79,6 @@ async def query_weather(city: str) -> str:
     return format_weather(data)
 
 
-@app.get("/connect")
-async def connect(request: Request):
-    async def event_generator():
-        while True:
-            if await request.is_disconnected():
-                break
-            # 这里可以添加更多逻辑，例如监听 MCP 事件等
-            yield {"data": json.dumps({"message": "Connected"})}
-            await asyncio.sleep(1)
-
-    return EventSourceResponse(event_generator())
-
-
-@app.post("/call_tool")
-async def call_tool(data: dict):
-    tool_name = data.get("tool_name")
-    tool_args = data.get("tool_args")
-    result = await mcp.call_tool(tool_name, tool_args)
-    return {"result": result.content[0].text}
-
-
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # 以标准 I/O 方式运行 MCP 服务器
+    mcp.run(transport='stdio')

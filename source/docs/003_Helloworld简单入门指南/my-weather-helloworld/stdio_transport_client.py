@@ -3,7 +3,7 @@ import os
 import json
 from typing import Optional
 from contextlib import AsyncExitStack
-from openai import AsyncOpenAI  # 导入异步客户端
+from openai import AsyncOpenAI
 from dotenv import load_dotenv
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -15,14 +15,13 @@ load_dotenv()
 
 class MCPClient:
     def __init__(self):
-        """初始化MCP客户端"""
         self.exit_stack = AsyncExitStack()
-        self.openai_api_key = os.getenv("OPENAI_API_KEY")  # 读取OpenAI API Key
-        self.base_url = os.getenv("BASE_URL")  # 读取BASE YRL
-        self.model = os.getenv("MODEL")  # 读取model
+        self.openai_api_key = os.getenv("OPENAI_API_KEY") 
+        self.base_url = os.getenv("BASE_URL")  
+        self.model = os.getenv("MODEL") 
 
         if not self.openai_api_key:
-            raise ValueError("❌未找到OpenAI API Key，请在.env文件中设置OPENAI_API_KEY")
+            raise ValueError("未找到OpenAI API Key，请在.env文件中设置OPENAI_API_KEY")
 
         self.client = AsyncOpenAI(api_key=self.openai_api_key, base_url=self.base_url)  # 使用异步客户端
         # 创建OpenAI client
@@ -110,7 +109,7 @@ class MCPClient:
 
     async def chat_loop(self):
         """运行交互式聊天循环"""
-        print("\n🤖 MCP客户端已启动！输入'quit'退出")
+        print("\n MCP客户端已启动！输入'quit'退出")
         while True:
             try:
                 query = input("\n你: ").strip()
@@ -118,9 +117,9 @@ class MCPClient:
                     break
 
                 response = await self.process_query(query)  # 发送用户输入到OpenAI API
-                print(f"\n🤖 OpenAI: {response}")
+                print(f"\n OpenAI: {response}")
             except Exception as e:
-                print(f"\n⚠发生错误: {str(e)}")
+                print(f"\n发生错误: {str(e)}")
 
     async def cleanup(self):
         """清理资源"""

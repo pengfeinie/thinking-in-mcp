@@ -13,13 +13,12 @@ load_dotenv()
 
 class MCPClient:
     def __init__(self):
-        """初始化MCP客户端"""
         self.openai_api_key = os.getenv("OPENAI_API_KEY")  # 读取OpenAI API Key
         self.base_url = os.getenv("BASE_URL")  # 读取BASE YRL
         self.model = os.getenv("MODEL")  # 读取model
 
         if not self.openai_api_key:
-            raise ValueError("❌未找到OpenAI API Key，请在.env文件中设置OPENAI_API_KEY")
+            raise ValueError("未找到OpenAI API Key，请在.env文件中设置OPENAI_API_KEY")
 
         self.client = AsyncOpenAI(api_key=self.openai_api_key, base_url=self.base_url)
         self.session = aiohttp.ClientSession()
@@ -34,11 +33,13 @@ class MCPClient:
                     data = json.loads(line[5:])
                     if data.get("message") == "Connected":
                         # 获取可用工具
-                        # 这里可以根据实际情况修改获取工具的逻辑
-                        response = await self.session.post("http://localhost:8000/list_tools")
-                        tools_data = await response.json()
-                        self.tools = tools_data.get("tools", [])
-                        print("\n已连接到服务器，支持以下工具:", [tool.get("name") for tool in self.tools])
+                        response = await self.session.get("http://localhost:8000/list_tools")
+                        try:
+                            tools_data = await response.json()
+                            self.tools = tools_data.get("tools", [])
+                            print("\n已连接到服务器，支持以下工具:", [tool.get("name") for tool in self.tools])
+                        except json.JSONDecodeError:
+                            print("无法解析服务器返回的工具列表数据")
                         break
 
     async def process_query(self, query: str) -> str:
@@ -56,11 +57,15 @@ class MCPClient:
             }
         } for tool in self.tools]
 
-        response = await self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            tools=available_tools
-        )
+        try:
+            response = await self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                tools=available_tools
+            )
+        except Exception as e:
+            print(f"调用OpenAI API出错: {str(e)}")
+            return ""
 
         # 处理返回的内容
         content = response.choices[0]
@@ -72,24 +77,41 @@ class MCPClient:
 
             # 执行工具
             data = {"tool_name": tool_name, "tool_args": tool_args}
-            result_resp = await self.session.post("http://localhost:8000/call_tool", json=data)
-            result = await result_resp.json()
-            print(f"\n\n[Calling tool {tool_name} with args {tool_args}]\n\n")
+            try:
+                result_resp = await self.session.post("http://localhost:8000/call_tool", json=data)
+                result_data = await result_resp.json()
+                print(f"\n\n[Calling tool {tool_name} with args {tool_args}]\n\n")
 
-            # 将模型返回的调用哪个工具数据和工具执行完成后的数据都存入messages中
-            messages.append(content.message.model_dump())
-            messages.append({
-                "role": "tool",
-                "content": result.get("result"),
-                "tool_call_id": tool_call.id,
-            })
+                # 检查工具执行结果是否有效
+                if result_data.get("result") is not None:
+                    # 将模型返回的调用哪个工具数据和工具执行完成后的数据都存入messages中
+                    messages.append(content.message.model_dump())
+                    messages.append({
+                        "role": "tool",
+                        "content": result_data.get("result"),
+                        "tool_call_id": tool_call.id,
+                    })
+                else:
+                    print("服务器返回的工具执行结果中'result'为null")
+                    return ""  # 避免再次调用OpenAI API
+
+            except json.JSONDecodeError:
+                print("无法解析服务器返回的工具执行结果数据")
+                return ""
+            except Exception as e:
+                print(f"调用服务器工具出错: {str(e)}")
+                return ""
 
             # 将上面的结果再返回给大模型用于生成最终的结果
-            response = await self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-            )
-            return response.choices[0].message.content
+            try:
+                response = await self.client.chat.completions.create(
+                    model=self.model,
+                    messages=messages,
+                )
+                return response.choices[0].message.content
+            except Exception as e:
+                print(f"再次调用OpenAI API出错: {str(e)}")
+                return ""
 
         return content.message.content
 
@@ -122,4 +144,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main())    

@@ -4,6 +4,8 @@
 
 模型上下文协议 (MCP) 是一个开放协议，用于标准化应用程序如何向大语言模型 (LLM) 提供上下文信息。您可以将 MCP 视为 AI 应用的 USB-C 接口。正如 USB-C 提供了一种标准化的方式，将您的设备连接到各种外围设备和配件，MCP 也提供了一种标准化的途径，将 AI 模型连接到不同的数据源和工具。[Introduction - Model Context Protocol](https://modelcontextprotocol.io/introduction)
 
+![](images/2025-03-30_134509.png)
+
 ![](images/2025-03-25_144034.png)
 
 总的来说，MCP解决的最大痛点，就是Agent开发中调用外部工具的技术门槛过高的问题。 我们都知道，能调用外部工具，是大模型进化为智能体Agent的关键，如果不能使用外部工具，大模型就 只能是个简单的聊天机器人，甚至连查询天气都做不到。由于底层技术限制，大模型本身是无法和外部工具直接通信的，因此Function calling的思路，就是创建一个外部函数（function）作为中介，一边传递大模型的请求，另一边调用外部工具，最终让大模型能够间接的调用外部工具。
@@ -24,13 +26,10 @@ Function calling是个非常不错的技术设计，自诞生以来，一直被�
 
 ## 2. 常用的MCP Server
 
-[https://mcp.so/server/mcp-browser-automation](https://mcp.so/server/mcp-browser-automation)
-
-[https://mcp.so/servers?category=browser-automation](https://mcp.so/servers?category=browser-automation)
-
-[https://glama.ai/mcp/servers](https://glama.ai/mcp/servers)
-
-[LangChain MCP Adapters开源项目 – LangChain与MCP的无缝对接工具 | AI-magic](https://www.msbd123.com/sites/81541.html)
+1. [https://mcp.so/server/mcp-browser-automation](https://mcp.so/server/mcp-browser-automation)
+2. [https://mcp.so/servers?category=browser-automation](https://mcp.so/servers?category=browser-automation)
+3. [https://glama.ai/mcp/servers](https://glama.ai/mcp/servers)
+4. [LangChain MCP Adapters开源项目 – LangChain与MCP的无缝对接工具 | AI-magic](https://www.msbd123.com/sites/81541.html)
 
 
 
