@@ -35,5 +35,8 @@ html_css_files = [
 
 # add "Edit on Github"
 html_context = {
-	"display_github": True
+	"display_github": True,
+        "github_user":"pengfeinie",
+	"github_repo":"thinking-in-mcp",
+	"github_version":"main/source/"
 }
