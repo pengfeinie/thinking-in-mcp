@@ -32,3 +32,8 @@ html_static_path = ['_static']
 html_css_files = [
     'custom.css',
 ]
+
+# add "Edit on Github"
+html_context = {
+	"display_github": True
+}
