@@ -12,8 +12,9 @@ Welcome to thinking-in-mcp's documentation!
 
    docs/001_MCP技术体系简介/README.md
    docs/002_开发工具入门指南/README.md
-   docs/003_Helloworld简单入门指南/README.md
-   docs/004_在CherryStudio中尝试MCP/README.md
+   docs/003_Function_Calling的工作流程/README.md
+   docs/004_Helloworld简单入门指南/README.md
+   docs/005_在CherryStudio中尝试MCP/README.md
 
 
 
